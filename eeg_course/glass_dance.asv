@@ -18,9 +18,22 @@ xlabel('Time (s)')
 
 % inspect power spectrum
 hz = linspace(0, srate / 2, floor(length(glassclip) / 2) + 1);
-powr = abs(fft)
+powr = abs(fft(glassclip(:, 1)) / pnts);
 
+subplot(512), cla 
+plot(hz, powr(1:length(hz)))
+set(gca, 'xlim', [100 2000], 'ylim', [0 max(powr)])
+xlabel('Frequency (Hz)'), ylabel('Amplitude')
 
+% pick freqs to filter
+frange = [300 460];
+
+% design an FIR1 filter
+fkern = fir1(2001, frange / (srate / 2), 'bandpass');
+
+% apply the filter to the signal
+filtglass(:, 1) = filtfilt(fkern, 1, glassclip(:, 1));
+filtglass(:, 2) = filtfilt(fkern, )
 
 
 
