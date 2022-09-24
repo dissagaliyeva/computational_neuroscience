@@ -1,0 +1,6 @@
+function [y] = slope(m, x, b)
+    y = m * x + b;
+end
+
+y = slope(2, 3, 5);
+disp(y)
