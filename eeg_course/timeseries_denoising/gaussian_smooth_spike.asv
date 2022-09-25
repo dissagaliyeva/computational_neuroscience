@@ -1,0 +1,51 @@
+%% Lecture
+% Course: Singal processing and image processing in MATLAB and Python
+% Section: Time-domain denoising
+% Video: Gaussian-smooth a spike time series
+
+%% generate times series of random spikes
+
+% number of spikes
+n = 300;
+
+% inter-spike intervals (exponential distribution for bursts)
+isi = round(exp(randn(n, 1)) * 10);
+
+% generate spike time series
+spikes = 0;
+
+for i=1:n
+    spikes(length(spikes) + isi(i)) = 1;
+end
+
+figure(1), clf, hold on
+h = plot(spikes);
+set(gca, 'ylim', [0 1.01], 'xlim', [0 length(spikes) + 1])
+set(h, 'color', [1 1 1]*.7)
+xlabel('Time (a.u)')
+
+%% create and implement Gaussian window
+
+% full width half maximum: key Gaussian parameter
+fwhm = 5;
+
+% normalized time vector in ms
+k = 10;
+gtime = -k : k;
+
+% create Gaussian window 
+gauswin = exp(-(4 * log(2) * gtime.^2) / fwhm^2);
+gauswin = gauswin / sum(gauswin);
+
+% initialize filtered signal vector
+filtsigG = zeros(size(spikes));
+
+for i = k + 1: length(spikes) - k - 1
+    filtsigG(i) = sum(spikes(i - k: i + k).*gauswin);
+end
+
+% plot filtered signal (spike probability density)
+plot(filtsigG, 'r', 'linew', 2)
+legend({'Spikes', 'Spikes p.d.'})
+title('Spikes and spike probability density')
+
