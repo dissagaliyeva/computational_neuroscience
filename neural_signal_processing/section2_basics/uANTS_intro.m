@@ -33,7 +33,7 @@ erp = mean(EEG.data(:, :, :),3);
 
 
 % pick a channel and plot ERP
-chan2plot = 'fcz';
+chan2plot = 'PO3';
 
 figure(1), clf
 plot(EEG.times,erp( strcmpi({EEG.chanlocs.labels},chan2plot) ,:),'linew',2)
@@ -42,30 +42,39 @@ set(gca,'xlim',[-400 1200])
 
 %% plot topographical maps
 
-time2plot = 600; % in ms
+time2plot = 300; % in ms
 
 % convert time in ms to time in indices
 [~,tidx] = min(abs(EEG.times - time2plot));
 
 % make a topographical map of the ERP at only this time point.
 figure(2), clf
-topoplotIndie(erp, EEG.chanlocs)
+topoplotIndie(erp(:, tidx), EEG.chanlocs)
 title([ 'ERP from ' num2str(time2plot) ' ms' ])
 colorbar
+colormap jet
+% set colorbar range
+set(gca, 'clim', [-8 8])
 
 %% plot multiple topographical maps in 100 increments
 
-k = 100;
+j = 100;
 
-for i = 1:15
+for i = 1:10
+    % convert time in ms to time in indices
+    [~,tidx] = min(abs(EEG.times - j));
     figure(i + 1)
-    topoplotIndie(erp, EEG.chanlocs)
-    
-
+    topoplotIndie(erp(:, tidx), EEG.chanlocs)
+    title([ 'ERP from ' num2str(j) ' ms' ])
+    colorbar
+    colormap jet
+    set(gca, 'clim', [-8 8])
+    j = j + 100;
+end
 
 %% now for sample CSD V1 data
 
-%load v1_laminar
+load v1_laminar
 
 % check out the variables in this mat file, using the function whos
 % If you don't know what variables are in this file vs. already in the workspace,
