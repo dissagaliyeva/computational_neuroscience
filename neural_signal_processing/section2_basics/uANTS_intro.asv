@@ -57,10 +57,7 @@ colorbar
 
 k = 100;
 
-for i = 1:15
-    figure(i + 1)
-    topoplotIndie(erp, EEG.chanlocs)
-    
+for i = 1
 
 
 %% now for sample CSD V1 data
