@@ -85,20 +85,21 @@ load v1_laminar
 %%
 
 % plot ERP from channel 7 in one line of code!
-%figure(3), clf
-%plot(timevec,
-%hold on
-%plot(get(gca,'xlim'),[0 0],'k--')
-%plot([0 0],get(gca,'ylim'),'k--')
-%plot([0 0]+.5,get(gca,'ylim'),'k--')
-%xlabel('Time (s)'), ylabel('Activity (\muV)')
-%set(gca,'xlim',[-.1 1.4])
+figure(3), clf
+plot(timevec, mean(csd(7, :, :), 3))
+hold on
+plot(get(gca,'xlim'),[0 0],'k--')
+plot([0 0],get(gca,'ylim'),'k--')
+plot([0 0]+.5,get(gca,'ylim'),'k--')
+xlabel('Time (s)'), ylabel('Activity (\muV)')
+set(gca,'xlim',[-.1 1.4])
 
 
 % plot depth-by-time image of ERP by averaging over trials
-%figure(4), clf
-%contourf(timevec,1:16,squeeze(mean(csd,3)),40,'linecolor','none')
-%set(gca,'xlim',[0 1.3])
-%xlabel('Time (sec.)'), ylabel('Cortical depth')
+figure(4), clf
+contourf(timevec,1:16,squeeze(mean(csd,3)),40,'linecolor','none')
+set(gca,'xlim',[0 1.3])
+xlabel('Time (sec.)'), ylabel('Cortical depth')
+colormap jet
 
 %% done.
