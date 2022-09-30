@@ -26,22 +26,22 @@
 
 % specify EEG parameters
 EEG.srate  = 500; % sampling rate in Hz
-EEG.pnts   = 
-EEG.trials = 
-EEG.nbchan = 
+EEG.pnts   = 2000;
+EEG.trials = 64;
+EEG.nbchan = 64;
 
 % time vector
 EEG.times = (0:EEG.pnts-1)/EEG.srate;
 
-
 % create data as white noise
-EEG.data = randn
+EEG.data = randn(EEG.nbchan, EEG.pnts, EEG.trials);
 
 % the function below takes at least one argument (EEG),
 % and optionally a second argument (channel number),
 % and optionally a third argument (figure number)
-plot_simEEG(EEG,2,3)
-
+plot_simEEG(EEG,15,3)
+colormap jet
+colorbar
 
 %%% Question: What is the effect of noise amplitude on the 
 %             resulting graphs?
@@ -59,13 +59,13 @@ plot_simEEG(EEG,2,3)
 
 
 % feel free to change some parameters compared to above...
-EEG.nbchan = 4;
+EEG.nbchan = 64;
 
 % the key parameter of pink noise is the exponential decay (ed)
 ed = 50; % try different values!
 
 % initialize EEG data as a zeros matrix
-EEG.data = zeros();
+EEG.data = zeros([EEG.trials EEG.pnts EEG.nbchan]);
 
 
 for chani=1:EEG.nbchan
@@ -86,7 +86,9 @@ for chani=1:EEG.nbchan
     end
 end
 
-
+plot_simEEG(EEG,15,3)
+colormap jet
+colorbar
 
 %%% Question: Which looks more like real EEG data: white or pink noise?
 %             Why do you think this is?
