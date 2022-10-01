@@ -263,12 +263,12 @@ hz = linspace(0,EEG.srate,EEG.pnts);
 %%% create frequency-domain Gaussian
 s  = fwhm*(2*pi-1)/(4*pi); % normalized width
 x  = hz-peakfreq;          % shifted frequencies
-fg = exp(-.5*(x/s).^2);    % gaussian
+fg1 = exp(-.5*(x/s).^2);    % gaussian
 
 %%% create frequency-domain Gaussian
 s2  = fwhm*(2*pi-1)/(4*pi); % normalized width
 x2  = hz-peakfreq2;          % shifted frequencies
-fg2 = exp(-.5*(x/s2).^2);    % gaussian
+fg2 = exp(-.5*(x2/s2).^2);    % gaussian
 
 for chani=1:EEG.nbchan
     for triali=1:EEG.trials
@@ -280,13 +280,17 @@ for chani=1:EEG.nbchan
         fc = rand(1,EEG.pnts) .* exp(1i*2*pi*rand(1,EEG.pnts));
         
         % taper Fourier coefficients by the Gaussian
-        fc = fc .* fg;
+        fc1 = fc .* fg1;
+
+        % taper Fourier coefficients by the Gaussian
+        fc2 = fc .* fg2;
         
         % go back to time domain to get EEG data
-        EEG.data(chani,:,triali) = real( ifft(fc) );
+        EEG.data(chani,:,triali) = real( ifft(fc1) ) + real(ifft(fc2));
     end
 end
 
+plot_simEEG(EEG)
 
 %% 5) transients #1: Gaussian
 
@@ -303,17 +307,20 @@ EEG.data = zeros(EEG.nbchan,EEG.pnts,EEG.trials);
 for chani=1:EEG.nbchan
     for triali=1:EEG.trials
         
-        % generate time-domain gaussian
-        trialpeak = peaktime;
-        gaus = 
+        % generate time-domain gaussian: normal
+        % gaus = exp(-(EEG.times - peaktime).^2 / (width^2*2));
         
+        % with jitter
+        trialpeak = peaktime + randn * 100;
+        gaus = exp(-(EEG.times - trialpeak).^2 / (width^2*2));
+
         % data are the Gaussian
-        EEG.data(chani,:,triali) = exp(-EEG.times^2 / width);
+        EEG.data(chani,:,triali) = gaus;
     end
 end
 
 % and plot
-plot_simEEG(EEG,1,1);
+plot_simEEG(EEG,1,2);
 
 %%% Questions: What happens if you add random jitter to the peaktime on each trial? 
 %              How much jitter until the ERP is nearly gone?
@@ -344,15 +351,18 @@ for chani=1:EEG.nbchan
         
         
         % generate sine wave with same phase
-        sw = cos(EEG.times);
+        sw = sin(2*pi*sfreq*EEG.times);
         
         
-        % data are sine wave times Gaussian
-        EEG.data(chani,:,triali) = gaus;
+        % data are sine wave times Gaussian with noise
+        % EEG.data(chani,:,triali) = gaus .* sw + randn(1, EEG.pnts);
+
+        EEG.data(chani,:,triali) = gaus .* sw;
     end
 end
 
 % and plot
+set(gca, 'xlim', [0 3])
 plot_simEEG(EEG,1,1);
 
 %             
@@ -363,6 +373,31 @@ plot_simEEG(EEG,1,1);
 %%% Question: How can you modify the code to make the transient non-phase-locked?
 %             Which of the three data plots are most affected by phase-locked vs. non-phase-locked?
 
+% re-initialize EEG data
+EEG.data = zeros(EEG.nbchan,EEG.pnts,EEG.trials);
+
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+        % generate time-domain gaussian
+        trialpeak = peaktime + randn/5;
+        gaus = exp( -(EEG.times-trialpeak).^2 / (2*width^2) );
+        
+        
+        % generate sine wave with same phase
+        sw = sin(2*pi*sfreq*EEG.times + randn * 2 * pi);
+        
+        
+        % data are sine wave times Gaussian with noise
+        % EEG.data(chani,:,triali) = gaus .* sw + randn(1, EEG.pnts);
+
+        EEG.data(chani,:,triali) = gaus .* sw;
+    end
+end
+
+% and plot
+set(gca, 'xlim', [0 3])
+plot_simEEG(EEG,1,2);
 
 
 %%

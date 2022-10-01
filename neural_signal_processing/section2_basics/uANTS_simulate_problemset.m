@@ -307,17 +307,20 @@ EEG.data = zeros(EEG.nbchan,EEG.pnts,EEG.trials);
 for chani=1:EEG.nbchan
     for triali=1:EEG.trials
         
-        % generate time-domain gaussian
-        trialpeak = peaktime;
-        gaus = 
+        % generate time-domain gaussian: normal
+        % gaus = exp(-(EEG.times - peaktime).^2 / (width^2*2));
         
+        % with jitter
+        trialpeak = peaktime + randn * 100;
+        gaus = exp(-(EEG.times - trialpeak).^2 / (width^2*2));
+
         % data are the Gaussian
-        EEG.data(chani,:,triali) = exp(-EEG.times^2 / width);
+        EEG.data(chani,:,triali) = gaus;
     end
 end
 
 % and plot
-plot_simEEG(EEG,1,1);
+plot_simEEG(EEG,1,2);
 
 %%% Questions: What happens if you add random jitter to the peaktime on each trial? 
 %              How much jitter until the ERP is nearly gone?
@@ -348,7 +351,7 @@ for chani=1:EEG.nbchan
         
         
         % generate sine wave with same phase
-        sw = cos(EEG.times);
+        sw = cos(2*pi*sfreq*EEG.times);
         
         
         % data are sine wave times Gaussian
