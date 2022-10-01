@@ -49,7 +49,6 @@ set(gca,'xlim',[0 40])
 xlabel('Frequency (Hz)'), ylabel('Power')
 title('Static power spectrum')
 
-
 %% time-frequency analysis
 
 % frequencies in Hz (hard-coded to 2 to 30 in 40 steps)
@@ -90,6 +89,9 @@ subplot(224)
 contourf(EEG.times,frex,tf,40,'linecolor','none')
 xlabel('Time'), ylabel('Frequency (Hz)')
 title('Time-frequency plot')
+colormap jet
+colorbar
+
 
 %%
 

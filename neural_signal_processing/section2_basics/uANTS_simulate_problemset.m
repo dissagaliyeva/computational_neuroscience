@@ -207,7 +207,7 @@ plot_simEEG(EEG, 1, 2)
 
 % signal parameters in Hz
 peakfreq = 14;
-fwhm     =  5;
+fwhm     =  1;
 
 % frequencies
 hz = linspace(0,EEG.srate,EEG.pnts);
@@ -228,24 +228,69 @@ for chani=1:EEG.nbchan
         fc = rand(1,EEG.pnts) .* exp(1i*2*pi*rand(1,EEG.pnts));
         
         % taper Fourier coefficients by the Gaussian
-        fc = 
+        fc = fc .* fg;
         
         % go back to time domain to get EEG data
         EEG.data(chani,:,triali) = real( ifft(fc) );
     end
 end
 
-% and plot
-plot_simEEG(EEG)
+% plot magnitude coefficient of the Fourier with respect to amplitude
+% spectrum 
+% plot(hz, abs(fc.*fg))
 
+plot(real(ifft(fc)))
+
+% and plot
+plot_simEEG(EEG, 1, 1)
+plot_simEEG(EEG, 1, 2)
 %             
 %%% Question: What is the effect of FWHM on the results? Is larger or smaller more realistic?
-% 
+% the resulting fwhm looks best and most natural when it's equal to 5.
+% There should be a distinctive tf plot with bold line; 
 % 
 %%% Question: Can you modify the code to have narrowband activity at two different frequency ranges?
 % 
-% 
 
+% signal parameters in Hz
+peakfreq = 32;
+peakfreq2 = 15;
+fwhm     =  5;
+
+% frequencies
+hz = linspace(0,EEG.srate,EEG.pnts);
+
+%%% create frequency-domain Gaussian
+s  = fwhm*(2*pi-1)/(4*pi); % normalized width
+x  = hz-peakfreq;          % shifted frequencies
+fg1 = exp(-.5*(x/s).^2);    % gaussian
+
+%%% create frequency-domain Gaussian
+s2  = fwhm*(2*pi-1)/(4*pi); % normalized width
+x2  = hz-peakfreq2;          % shifted frequencies
+fg2 = exp(-.5*(x2/s2).^2);    % gaussian
+
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+        %%% As with previous simulations, don't worry if you don't understand the mechanisms;
+        %   that will be clear tomorrow. Instead, you can plot each step to try to build intuition.
+        
+        % Fourier coefficients of random spectrum
+        fc = rand(1,EEG.pnts) .* exp(1i*2*pi*rand(1,EEG.pnts));
+        
+        % taper Fourier coefficients by the Gaussian
+        fc1 = fc .* fg1;
+
+        % taper Fourier coefficients by the Gaussian
+        fc2 = fc .* fg2;
+        
+        % go back to time domain to get EEG data
+        EEG.data(chani,:,triali) = real( ifft(fc1) ) + real(ifft(fc2));
+    end
+end
+
+plot_simEEG(EEG)
 
 %% 5) transients #1: Gaussian
 

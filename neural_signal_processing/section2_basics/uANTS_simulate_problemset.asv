@@ -151,7 +151,9 @@ plot_simEEG(EEG, 1, 1)
 colormap jet
 colorbar
 
-% in this case we see that in the time-frequency plot there are bursts 
+% in this case we see that in the time-frequency plot there are bursts at
+% fruqncy 3-5; that is the articats in the tf domain. The real results
+% should be a static line as in 13Hz instead of the bursts
 
 %%
 
@@ -174,7 +176,7 @@ for chani=1:EEG.nbchan
         % create a multicomponent sine wave
         sinewave = zeros(1,EEG.pnts);
 
-        sinewave = sinewave + amps(2) * sin(2*pi*(frex(2)) * EEG.times * rand(EEG.pnts) * (25-5) + 5);
+        sinewave = sinewave + amps(2) * sin(2*pi*(frex(2)) * EEG.times * rand * 2 * pi);
        
         % data as a sine wave plus noise
         EEG.data(chani, :, triali) = sinewave + randn(size(sinewave));
@@ -184,6 +186,8 @@ end
 % and plot
 plot_simEEG(EEG, 1, 2)
 
+% randi will work, but that function generates integers, so the range of 
+% phase values is severely restricted. rand*2*pi will sample all possible phase values.
 
 
 %%
@@ -203,7 +207,7 @@ plot_simEEG(EEG, 1, 2)
 
 % signal parameters in Hz
 peakfreq = 14;
-fwhm     =  5;
+fwhm     =  1;
 
 % frequencies
 hz = linspace(0,EEG.srate,EEG.pnts);
@@ -224,23 +228,64 @@ for chani=1:EEG.nbchan
         fc = rand(1,EEG.pnts) .* exp(1i*2*pi*rand(1,EEG.pnts));
         
         % taper Fourier coefficients by the Gaussian
-        fc = 
+        fc = fc .* fg;
         
         % go back to time domain to get EEG data
         EEG.data(chani,:,triali) = real( ifft(fc) );
     end
 end
 
-% and plot
-plot_simEEG(EEG)
+% plot magnitude coefficient of the Fourier with respect to amplitude
+% spectrum 
+% plot(hz, abs(fc.*fg))
 
+plot(real(ifft(fc)))
+
+% and plot
+plot_simEEG(EEG, 1, 1)
+plot_simEEG(EEG, 1, 2)
 %             
 %%% Question: What is the effect of FWHM on the results? Is larger or smaller more realistic?
-% 
+% the resulting fwhm looks best and most natural when it's equal to 5.
+% There should be a distinctive tf plot with bold line; 
 % 
 %%% Question: Can you modify the code to have narrowband activity at two different frequency ranges?
 % 
-% 
+
+% signal parameters in Hz
+peakfreq = 32;
+peakfreq2 = 15;
+fwhm     =  5;
+
+% frequencies
+hz = linspace(0,EEG.srate,EEG.pnts);
+
+%%% create frequency-domain Gaussian
+s  = fwhm*(2*pi-1)/(4*pi); % normalized width
+x  = hz-peakfreq;          % shifted frequencies
+fg = exp(-.5*(x/s).^2);    % gaussian
+
+%%% create frequency-domain Gaussian
+s2  = fwhm*(2*pi-1)/(4*pi); % normalized width
+x2  = hz-peakfreq2;          % shifted frequencies
+fg2 = exp(-.5*(x/s2).^2);    % gaussian
+
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+        %%% As with previous simulations, don't worry if you don't understand the mechanisms;
+        %   that will be clear tomorrow. Instead, you can plot each step to try to build intuition.
+        
+        % Fourier coefficients of random spectrum
+        fc = rand(1,EEG.pnts) .* exp(1i*2*pi*rand(1,EEG.pnts));
+        
+        % taper Fourier coefficients by the Gaussian
+        fc = fc .* fg;
+        
+        % go back to time domain to get EEG data
+        EEG.data(chani,:,triali) = real( ifft(fc) );
+    end
+end
 
 
 %% 5) transients #1: Gaussian
