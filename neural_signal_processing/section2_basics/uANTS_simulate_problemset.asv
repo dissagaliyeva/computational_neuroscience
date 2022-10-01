@@ -400,13 +400,43 @@ set(gca, 'xlim', [0 3])
 plot_simEEG(EEG,1,2);
 
 
-%%
+%% Partially phase-locked = rand * pi, Fully phase-locked = rand * 2 * pi
 
 
 %% More exercises for more fun!
 
 
 %% 7) Add pink noise to #5
+
+% gaussian parameters (in seconds)
+peaktime = 1;
+width = .1;
+ed = 50;
+
+% re-initialize EEG data
+EEG.data = zeros(EEG.nbchan,EEG.pnts,EEG.trials);
+
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+        % generate time-domain gaussian: normal
+        gaus = exp(-(EEG.times - peaktime + randn / 10).^2 / (width^2*2));
+
+        % generate one-sided 1/f amplitude spectrum
+        as = rand(1,EEG.pnts) .* exp(-(0:EEG.pnts-1)/ed);
+        
+        % Fourier coefficients as amplitudes times random phases
+        fc = as .* exp(1i*2*pi*rand(size(as)));
+        
+        % inverse Fourier transform to create the noise
+        EEG.data(chani,:,triali) = gaus + 500 * real(ifft(fc));
+  
+    end
+end
+
+% and plot
+plot_simEEG(EEG,1,1)
+
 
 
 %% 8) Combine #4 and #6 to make a transient (Gaussian-windowed) non-stationary signal
