@@ -176,7 +176,7 @@ for chani=1:EEG.nbchan
         % create a multicomponent sine wave
         sinewave = zeros(1,EEG.pnts);
 
-        sinewave = sinewave + amps(2) * sin(2*pi*(frex(2)) * EEG.times * rand(EEG.pnts) * (25-5) + 5);
+        sinewave = sinewave + amps(2) * sin(2*pi*(frex(2)) * EEG.times * rand * 2 * pi);
        
         % data as a sine wave plus noise
         EEG.data(chani, :, triali) = sinewave + randn(size(sinewave));
@@ -186,6 +186,8 @@ end
 % and plot
 plot_simEEG(EEG, 1, 2)
 
+% randi will work, but that function generates integers, so the range of 
+% phase values is severely restricted. rand*2*pi will sample all possible phase values.
 
 
 %%
