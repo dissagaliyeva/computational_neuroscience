@@ -151,9 +151,7 @@ plot_simEEG(EEG, 1, 1)
 colormap jet
 colorbar
 
-% in this case we see that in the time-frequency plot there are bursts at
-% fruqncy 3-5; that is the articats in the tf domain. The real results
-% should be a static line as in 13Hz instead of the bursts
+% in this case we see that in the time-frequency plot there are bursts 
 
 %%
 
