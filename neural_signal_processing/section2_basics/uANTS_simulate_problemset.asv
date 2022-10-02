@@ -441,5 +441,39 @@ plot_simEEG(EEG,1,1)
 
 %% 8) Combine #4 and #6 to make a transient (Gaussian-windowed) non-stationary signal
 
+% signal parameters in Hz
+peakfreq = 14;
+fwhm     =  5;
+
+% frequencies
+hz = linspace(0,EEG.srate,EEG.pnts);
+
+%%% create frequency-domain Gaussian
+s  = fwhm*(2*pi-1)/(4*pi); % normalized width
+x  = hz-peakfreq;          % shifted frequencies
+fg = exp(-.5*(x/s).^2);    % gaussian
+
+
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+        %%% As with previous simulations, don't worry if you don't understand the mechanisms;
+        %   that will be clear tomorrow. Instead, you can plot each step to try to build intuition.
+        
+        % Fourier coefficients of random spectrum
+        fc = rand(1,EEG.pnts) .* exp(1i*2*pi*rand(1,EEG.pnts));
+        
+        % taper Fourier coefficients by the Gaussian
+        fc = real(ifft(fc .* fg));
+        
+        % create time-domain gaussian
+        gaus = exp(-(EEG.times - 1).^2 / (2 *.2^2));
+
+        % go back to time domain to get EEG data
+        EEG.data(chani,:,triali) = fc .* gaus;
+    end
+end
+
+plot_simEEG(EEG, 1, 1)
 
 %% done.
