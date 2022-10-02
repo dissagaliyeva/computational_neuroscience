@@ -214,12 +214,36 @@ xlabel('Time (s)'), ylabel('Amplitude')
 peaktime = 1; % seconds
 width = .12;
 
-gaus = exp( -(EEG.times-peaktime).^2 / (2*width^2) );
 
-% then multiply the gaussian by a sine wave
-sinewave = sin(2 * pi * sinefreq * EEG.times) .* gaus;
+for chan = 1: EEG.nbchan
+    for trial = 1 : EEG.trials
+        gaus = exp( -(EEG.times-peaktime).^2 / (2*width^2) );
+        
+        % then multiply the gaussian by a sine wave
+        sinewave = sin(2 * pi * sinefreq * EEG.times) .* gaus;
+        EEG.data(chan, :, trial) = sinewave;
+    end 
+end
 
-plot(EEG.times, sinewave)
+plot_simEEG(EEG, 2, 1)
+
+%% transient oscillation w/ Gaussian + noise
+
+peaktime = 1; % seconds
+width = .12;
+
+for chan = 1: EEG.nbchan
+    for trial = 1 : EEG.trials
+        gaus = exp( -(EEG.times-peaktime + randn/5).^2 / (2*width^2) );
+        
+        % then multiply the gaussian by a sine wave
+        sinewave = sin(2 * pi * sinefreq * EEG.times) .* gaus;
+
+        EEG.data(chan, :, trial) = sinewave;
+    end 
+end
+
+plot_simEEG(EEG, 2, 2)
 
 %% 6) repeat #3 with white noise
 
@@ -251,30 +275,42 @@ plot_simEEG(EEG, 21, 4)
 
 %% 7) repeat #5 with 1/f noise
 
-peaktime = 1; % seconds
-width = .12;
+% amount of noise
+noiseamp = .3;
 
+
+peaktime = 1; % seconds
+width    = .12;
+sinefreq = 7; % for sine wave
+
+% create Gaussian taper
 gaus = exp( -(EEG.times-peaktime).^2 / (2*width^2) );
 
-% generate 1/f amplitude
-ed = 50; % exponential decay -> defines how the amplitude function goes down
-as = rand(1, floor((length(EEG.times)) / 2) - 1) .* exp(-(1:floor((length(EEG.times))/2) - 1) / ed);
-as = [as(1) as 0 0 as(:, end:-1:1)];
+% loop over channels and trials
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+        % trial-unique sine wave
+        cosw = cos(2*pi*sinefreq*EEG.times + 2*pi*rand);
+        
+        %%% 1/f noise
+        ed = 50; % exponential decay parameter
+        as = rand(1,floor(EEG.pnts/2)-1) .* exp(-(1:floor(EEG.pnts/2)-1)/ed);
+        as = [as(1) as 0 as(:,end:-1:1)];
+        
+        % Fourier coefficients
+        fc = as .* exp(1i*2*pi*rand(size(as)));
+        
+        % inverse Fourier transform to create the noise
+        noise = real(ifft(fc)) * EEG.pnts;
+        
+        
+        % data as signal + noise
+        EEG.data(chani,:,triali) = cosw .* gaus + noiseamp*noise;
+    end
+end
 
-% Fourier coefficient
-fc = as .* exp(1i * 2 * pi * rand(size(as)));
-
-% inverse Fourier transform to create noise
-noise = real(ifft(fc)) * pnts;
-
-% then multiply the gaussian by a sine wave
-sinewave = sin(2 * pi * sinefreq * EEG.times + noise(:, 1:end-1)) .* gaus ;
-
-plot(EEG.times, sinewave)
-
-
-
-
+plot_simEEG(EEG,2,7)
 
 %%
 
