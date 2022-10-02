@@ -84,7 +84,7 @@ for chani=1:EEG.nbchan
     for triali=1:EEG.trials
         
          for idx = 1:length(frex)
-             sinewave(idx, :) = amps(idx) * sin(2 * pi * frex(idx) * EEG.times);
+             sinewave = sinewave + amps(idx) * sin(2 * pi * frex(idx) * EEG.times);
          end
         
         % sinewave = sum(amps) * sin(2 * pi * sum(frex) * EEG.times)
@@ -94,7 +94,7 @@ for chani=1:EEG.nbchan
     end
 end
 
-plot_simEEG(EEG, 12, 3)
+plot_simEEG(EEG, 12, 1)
 plot_simEEG(EEG, 21, 4)
 
 %% Question: What can you change in the code above to make the EEG
@@ -156,9 +156,17 @@ colorbar
 
 %% 4) nonstationary sine waves: chirp
 
-% hint: instantaneous frequency via interpolated random numbers
-freqmod = 20*interp1(rand(1,10),linspace(1,10,EEG.pnts));
-signal  = sin( 2*pi * ((EEG.times + cumsum(freqmod))/EEG.srate) );
+for chan = 1: EEG.nbchan
+    for trial = 1 : EEG.trials
+        % hint: instantaneous frequency via interpolated random numbers
+        freqmod = 20*interp1(rand(1,10),linspace(1,10,EEG.pnts));
+        signal  = sin( 2*pi * ((EEG.times + cumsum(freqmod))/EEG.srate) );
+
+        EEG.data(chan, :, trial) = signal;
+    end
+end
+
+plot_simEEG(EEG, 2, 5)
 
 figure(2)
 subplot(211)
@@ -209,18 +217,60 @@ width = .12;
 gaus = exp( -(EEG.times-peaktime).^2 / (2*width^2) );
 
 % then multiply the gaussian by a sine wave
+sinewave = sin(2 * pi * sinefreq * EEG.times) .* gaus;
 
-
+plot(EEG.times, sinewave)
 
 %% 6) repeat #3 with white noise
 
+% list of frequencies and corresponding amplitudes
+frex = [ 3 5 16 ];
+amps = [ 2 4 5  ];
 
+sinewave = zeros(length(frex), length(EEG.times));
+
+% loop over channels and trials
+for chani=1:EEG.nbchan
+    for triali=1:EEG.trials
+        
+         for idx = 1:length(frex)
+             sinewave(idx, :) = amps(idx) * sin(2 * pi * frex(idx) * EEG.times);
+         end
+        
+        % sinewave = sum(amps) * sin(2 * pi * sum(frex) * EEG.times)
+
+        % data as a sine wave plus noise
+        EEG.data(chani,:,triali) = sum(sinewave) + (randn(size(EEG.times)) * frex(1) + amps(1));
+    end
+end
+
+plot_simEEG(EEG, 12, 3)
+plot_simEEG(EEG, 21, 4)
 
 
 
 %% 7) repeat #5 with 1/f noise
 
+peaktime = 1; % seconds
+width = .12;
 
+gaus = exp( -(EEG.times-peaktime).^2 / (2*width^2) );
+
+% generate 1/f amplitude
+ed = 50; % exponential decay -> defines how the amplitude function goes down
+as = rand(1, floor((length(EEG.times)) / 2) - 1) .* exp(-(1:floor((length(EEG.times))/2) - 1) / ed);
+as = [as(1) as 0 0 as(:, end:-1:1)];
+
+% Fourier coefficient
+fc = as .* exp(1i * 2 * pi * rand(size(as)));
+
+% inverse Fourier transform to create noise
+noise = real(ifft(fc)) * pnts;
+
+% then multiply the gaussian by a sine wave
+sinewave = sin(2 * pi * sinefreq * EEG.times + noise(:, 1:end-1)) .* gaus ;
+
+plot(EEG.times, sinewave)
 
 
 
