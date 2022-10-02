@@ -176,28 +176,23 @@ title('Signal (chirp)')
 
 %% non-stationary sine wave with frequency domain to time domain
 
-times = -2:1/EEG.srate:10;
-
-ptime = 3;
-ampl = 5;
+ptime = 5;
+ampl = 10;
 fwhm = 3;
 
 % Gaussian
-gaus = ampl * exp(-(4 * log(2) * (times - ptime).^2) / fwhm^2);
+gaus = ampl * exp(-(4 * log(2) * (EEG.times - ptime).^2) / fwhm^2);
 
 winN = gaus ./ max(gaus);
-midp = dsearchn(times', ptime);
-pst5 = midp - 1 + dsearchn(gaus(midp:end)', .5);
-pre5 = dsearchn(gaus(1:midp)', .5);
-emp_fwhm = times(pst5) - times(pre5);
+midp = dsearchnn(EEG.times', ptime);
+pst5 = midp - 1 + dsearchnn(gaus(mid:end)', .5);
+pre5 = dsearchnn(gaus(1:midp)', .5);
+emp_fwhm = EEG.times(pst5) - EEG.times(pre5);
 
 figure(1), hold on
-plot(times, gaus, 'k', 'linew', 2)
-plot(times([pre5 pst5]), gaus([pre5 pst5]), 'ro--', 'markerfacecolor', 'k')
-plot(times([pre5 pst5]), [0 winN(pre5)], 'r:')
-plot(times([pre5 pst5]), [0 winN(pst5)], 'r:')
-title(['FWHM: ' num2str(fwhm) 's, empirical FWHM: ' num2str(emp_fwhm), 's'])
-xlabel('Time (s)'), ylabel('Amplitude')
+plot(EEG.times, gaus, 'k', 'linew', 2)
+plot(EEG.times([pre5 pst5]), gaus([pre5 pst5]), 'ro--', 'markerfacecolor', 'k')
+plot(EEG.times([pre5 pst5]), [0 winN(pre5)])
 
 
 %% 5) transient oscillations w/ Gaussian
@@ -209,7 +204,6 @@ width = .12;
 gaus = exp( -(EEG.times-peaktime).^2 / (2*width^2) );
 
 % then multiply the gaussian by a sine wave
-
 
 
 %% 6) repeat #3 with white noise

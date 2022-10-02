@@ -40,7 +40,7 @@ end
 % the function below takes at least one argument (EEG),
 % and optionally a second argument (channel number),
 % and optionally a third argument (figure number)
-plot_simEEG(EEG,2,1)
+plot_simEEG(EEG,2,2)
 
 %% 2) pure non-phase-locked sine wave
 
