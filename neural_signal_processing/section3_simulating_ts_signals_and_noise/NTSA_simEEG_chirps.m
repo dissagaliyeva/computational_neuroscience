@@ -15,11 +15,14 @@ time  = (0:pnts-1)/srate;
 %% chirps
 
 % "bipolar" chirp
-freqmod = linspace(5,15,pnts);
+freqmod = linspace(5,15,pnts);  % "f" in the formula
+
+% signal time series
+signal  = sin( 2*pi * ((time + cumsum(freqmod))/srate) );
 
 % multipolar chirp
-% k = 10; % poles for frequencies
-% freqmod = 20*interp1(rand(1,k),linspace(1,k,pnts));
+k = 10; % poles for frequencies
+freqmod = 20*interp1(rand(1,k),linspace(1,k,pnts));
 
 
 % signal time series
@@ -30,7 +33,7 @@ signal  = sin( 2*pi * ((time + cumsum(freqmod))/srate) );
 
 %% plotting
 
-figure(1), clf
+figure(2), clf
 
 subplot(211)
 plot(time,freqmod,'r','linew',3)
