@@ -85,8 +85,28 @@ plot(time([pst5 pst5]),[0 gwin(pst5)],'r:')
 title([ 'Requested FWHM: ' num2str(fwhm) 's, empirical FWHM: ' num2str(empfwhm) 's' ])
 xlabel('Time (s)'), ylabel('Amplitude')
 
+%% Euler's formula
+
+M = 2.4;
+k = 3*pi/4;
+
+meik = M * (cos(k) + 1i * sin(k));
+
+figure(4), clf
+subplot(121)
+polar([0 M],[0 k],'r'), hold on
+polar(M,k,'ro')
+title('Polar plane')
 
 
+subplot(122), hold on
+plot(meik,'ro')
+plot(real(meik),imag(meik),'gs')
+axis([-1 1 -1 1]*abs(meik))
+axis square
+xlabel('Real'), ylabel('Imag')
+grid on
+title('Cartesian (rectangular) plane')
 
 
 
