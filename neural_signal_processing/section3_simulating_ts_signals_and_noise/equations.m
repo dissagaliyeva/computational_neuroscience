@@ -57,3 +57,42 @@ for fi=1:length(frex)
     plot(time, sine_waves(fi, :))
     axis([ time([1 end]) -max(amplit) max(amplit) ])
 end
+
+%% Gaussian
+
+% simulation parameters
+time  = -2:1/1000:2;
+ptime = 1;  % peak time 
+ampl  = 45; % amplitude
+fwhm  = .9;
+
+% Gaussian
+gwin = ampl * exp( -(4*log(2) * (time-ptime).^2) / fwhm^2);
+
+% empirical FWHM
+gwinN   = gwin./max(gwin);
+midp    = dsearchn(time', ptime);
+pst5    = midp-1+dsearchn(gwinN(midp:end)',.5);
+pre5    = dsearchn(gwinN(1:midp)',.5);
+empfwhm = time(pst5) - time(pre5);
+
+
+figure(3), clf, hold on
+plot(time,gwin,'k','linew',2)
+plot(time([pre5 pst5]),gwin([pre5 pst5]),'ro--','markerfacecolor','k')
+plot(time([pre5 pre5]),[0 gwin(pre5)],'r:')
+plot(time([pst5 pst5]),[0 gwin(pst5)],'r:')
+title([ 'Requested FWHM: ' num2str(fwhm) 's, empirical FWHM: ' num2str(empfwhm) 's' ])
+xlabel('Time (s)'), ylabel('Amplitude')
+
+
+
+
+
+
+
+
+
+
+
+
