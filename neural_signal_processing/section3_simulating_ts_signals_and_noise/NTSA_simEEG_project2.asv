@@ -206,39 +206,12 @@ plot_simEEG(EEG,31,2);
 %% 4) Non-stationary oscillation in one dipole, transient oscillation in another dipole, noise in all dipoles
 
 %%% first pick two dipoles
-dipole1 = 15;
-dipole2 = 37;
-
-% noise in all dipoles
-for t = 1:length(EEG.trials)
-    for d = 1:length(EEG.nbchan)
-        EEG.data(d, :, t) = 3 * randn(size(EEG.times)) + 5;
-    end
-end
-
-% non-stationary oscillation
-for i = 1:length(EEG.trials)
-    non_stationary = sin(2*pi*10*EEG.times + 5 * pi/6 * randn);
-    EEG.data(dipole1, :, i) = non_stationary;
-end 
-
-% transient oscillations
-peaktime = 1; % seconds
-width = .12;
-
-for t = 1:length(EEG.trials)
-    gaus = exp(-(EEG.times - peaktime).^2 / (2*width^2));
-    sinewave = sin(2*pi*10 * EEG.times ) .* gaus;
-    EEG.data(dipole2, :, t) = sinewave;
-end
-
 
 %%% then do the simulation
 
 
 % plot the data
-plot_simEEG(EEG,dipole1,3);
-plot_simEEG(EEG,dipole2,2);
-
+plot_simEEG(EEG,56,3);
+plot_simEEG(EEG,31,2);
 
 %% 
