@@ -21,8 +21,8 @@ noiseamp = 2; % noise standard deviation
 
 
 % create signal
-swave  = cos( );
-gausw  = exp( 4*log(2)*(time-gpeakt) / gwidth^2 );
+swave  = cos(2*pi*time*sfreq);
+gausw  = exp( -(4*log(2)*(time-gpeakt).^2 / gwidth^2 ));
 signal = swave .* gausw;
 
 % create data and multiple channels plus noise
@@ -53,8 +53,8 @@ title('Average over trials')
 
 load v1_laminar.mat
 % first time seeing these data? Inspect!!
-clear
-whos
+% clear
+% whos
 
 %% plot some time domain features
 
@@ -67,12 +67,12 @@ figure(2), clf
 subplot(311), hold on
 
 % plot ERP from selected channel (in one line of code!)
-plot(timevec,csd(chan2plot,:,:),'b','linew',2)
+plot(timevec, mean(csd(chan2plot, :, :), 3),'b','linew',2)
 set(gca,'xlim',[-.1 1.3])
 title([ 'ERP from channel ' num2str(chan2plot) ])
 plot([0 0],get(gca,'ylim'),'k--')
 plot([0 0]+.5,get(gca,'ylim'),'k--')
-plot(get(gca,'clim'),[0 0],'k--') % clim?!
+plot(get(gca,'xlim'),[0 0],'k--') % clim?!
 ylabel('Voltage (\muV)')
 
 
@@ -99,5 +99,18 @@ xlabel('Time (s)'), ylabel('Channel')
 hold on
 plot([0 0],get(gca,'ylim'),'k--','linew',3)
 plot([0 0]+.5,get(gca,'ylim'),'k--','linew',3)
+
+
+figure(4), clf
+
+% make an image of the ERPs from all channels
+contourf(timevec,1:16,squeeze(mean(csd,3)), 40, 'linecolor', 'none')
+set(gca,'xlim',[-.1 1.3],'ydir','reverse')
+title('Time-by-depth plot')
+xlabel('Time (s)'), ylabel('Channel')
+hold on
+plot([0 0],get(gca,'ylim'),'k--','linew',3)
+plot([0 0]+.5,get(gca,'ylim'),'k--','linew',3)
+
 
 %% done.
