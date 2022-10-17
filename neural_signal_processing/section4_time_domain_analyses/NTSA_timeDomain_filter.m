@@ -11,7 +11,6 @@ load v1_laminar
 % reduce data for convenience
 data = double(squeeze( csd(7,:,:) ));
 
-
 % cutoff frequency for low-pass filter
 lowcut = 20; % in Hz
 

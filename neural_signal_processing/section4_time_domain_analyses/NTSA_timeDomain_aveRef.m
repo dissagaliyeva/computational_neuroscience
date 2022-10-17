@@ -30,7 +30,6 @@ EEG.cardata2 = bsxfun(@minus,EEG.data,mean(EEG.data,1));
 
 chan2plot = 'poz';
 
-
 % convert channel label to index
 chanidx = strcmpi({EEG.chanlocs.labels},chan2plot);
 

@@ -16,8 +16,8 @@ chan2use = 'o1';
 negpeaktime = [  50 110 ];
 pospeaktime = [ 110 170 ];
 
-% get the location of the channel
-chanloc = strcmpi({EEG.chanlocs.labels}, chan2use);
+% 
+chanloc = 
 
 %%% compute ERP
 erp = double( mean(EEG.data(chanidx,:,:),3) );
