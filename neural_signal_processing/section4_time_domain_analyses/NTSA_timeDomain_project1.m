@@ -13,14 +13,14 @@ chan2use = 'o1';
 
 % time window for negative peak
 % Mike's choices: 
-negpeaktime = [  50 110 ];
-pospeaktime = [ 110 170 ];
+negpeaktime = dsearchn(EEG.times',[  50 110 ]')';
+pospeaktime = dsearchn(EEG.times', [ 110 170 ]')';
 
 % get the location of the channel
 chanloc = strcmpi({EEG.chanlocs.labels}, chan2use);
 
 %%% compute ERP
-erp = double( mean(EEG.data(chanidx,:,:),3) );
+erp = double( mean(EEG.data(chanloc,:,:),3) );
 
 % plot ERP
 figure(1), clf
@@ -32,10 +32,16 @@ ylim = get(gca,'ylim');
 ph = patch(EEG.times(negpeaktime([1 1 2 2])),ylim([1 2 2 1]),'y');
 set(ph,'facealpha',.8,'edgecolor','none')
 
-
+ph = patch(EEG.times(pospeaktime([1 1 2 2])),ylim([1 2 2 1]),'g');
+set(ph,'facealpha',.8,'edgecolor','none')
 
 % move the patches to the background
 set(gca,'Children',flipud( get(gca,'Children') ))
+
+% axis labels, etc
+xlabel('Time (ms)')
+ylabel('Voltage (\muV)')
+title([ 'ERP from channel ' chan2use ])
 
 %% first low-pass filter (windowed sinc function)
 

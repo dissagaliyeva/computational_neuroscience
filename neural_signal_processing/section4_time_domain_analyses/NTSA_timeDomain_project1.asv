@@ -16,11 +16,11 @@ chan2use = 'o1';
 negpeaktime = [  50 110 ];
 pospeaktime = [ 110 170 ];
 
-% 
-chanloc = 
+% get the location of the channel
+chanloc = strcmpi({EEG.chanlocs.labels}, chan2use);
 
 %%% compute ERP
-erp = double( mean(EEG.data(chanidx,:,:),3) );
+erp = double( mean(EEG.data(chanloc,:,:),3) );
 
 % plot ERP
 figure(1), clf
@@ -29,9 +29,8 @@ set(gca,'xlim',[-300 1000])
 
 % plot patches over areas
 ylim = get(gca,'ylim');
-ph = patch(EEG.times(negpeaktime([1 1 2 2])),ylim([1 2 2 1]),'y');
-set(ph,'facealpha',.8,'edgecolor','none')
-
+ph = patch('x', EEG.times(negpeaktime([1 1 2 2])),'y',ylim([1 2 2 1]));
+set(ph,'facealpha',.8,'edgecolor','r')
 
 
 % move the patches to the background
